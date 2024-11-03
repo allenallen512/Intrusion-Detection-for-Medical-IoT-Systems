@@ -2,10 +2,12 @@ Finding the best intrusion detection system on WUSTL EHMS 2020 Dataset for Inter
 
 Link: https://www.cse.wustl.edu/~jain/ehms/index.html
 
+Useful Links:
+https://medium.com/swlh/k-means-clustering-on-high-dimensional-data-d2151e1a4240
+
 Data is in file "data.csv" 
 
-**Network Flow Headers: 
-**
+**Network Flow Headers:**
 Dir: Direction of the data flow. This can refer to whether data is inbound or outbound between source and destination.
 Flgs: Flags set in the network packets, often used in protocols like TCP to indicate specific packet states (e.g., SYN, ACK).
 SrcAddr: Source IP address of the device sending the data.
@@ -26,15 +28,13 @@ DIntPktAct: Actual interval of packets at the destination.
 SrcJitter: Variation in packet intervals (jitter) for packets sent by the source.
 DstJitter: Variation in packet intervals (jitter) for packets received by the destination.
 
-**Packet Size:
-**
+**Packet Size:**
 sMaxPktSz: Maximum packet size sent by the source.
 dMaxPktSz: Maximum packet size received by the destination.
 sMinPktSz: Minimum packet size sent by the source.
 dMinPktSz: Minimum packet size received by the destination.
 
-**Network Session:
-**
+**Network Session:**
 Dur: Duration of the session or data transfer.
 Trans: Number of transmissions that occurred during the session.
 TotPkts: Total number of packets transmitted in the session.
@@ -47,8 +47,7 @@ pSrcLoss: Percentage of packets lost at the source.
 pDstLoss: Percentage of packets lost at the destination.
 Rate: Rate of data transmission, which could be in bits per second or packets per second.
 
-**MAC Addresses and Packet Count: 
-**
+**MAC Addresses and Packet Count:**
 SrcMac: MAC address of the source device.
 DstMac: MAC address of the destination device.
 Packet_num: Number assigned to each packet, helping in identifying sequence.
@@ -64,7 +63,6 @@ Heart_rate: Overall heart rate of the patient.
 Resp_Rate: Patient’s respiratory rate.
 ST: ST segment from an ECG reading, which can indicate heart issues.
 
-**Attack Detection:
-**
+**Attack Detection:**
 Attack Category: Type or category of attack detected (e.g., DoS, probe, or other intrusion types).
 Label: Label indicating whether the traffic is normal or part of an attack.
