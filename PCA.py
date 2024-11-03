@@ -1,6 +1,11 @@
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.metrics import confusion_matrix, classification_report
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 dataPath = "data.csv"
 
@@ -74,4 +79,58 @@ def find_top_n_features(file_path, n):
     return feature_importance
 
 
-find_top_n_features(dataPath, 5)
+#find_top_n_features(dataPath, 2)
+
+def perform_kmeans_clustering(dataPath, n_components=2):
+    print("\nPerforming K-means clustering on PCA components...")
+    
+    # Read the data
+    data = pd.read_csv(dataPath)
+    features = data.select_dtypes(include=['float64', 'int64']).drop('Label', axis=1)
+    labels = data['Label']
+    
+    # Perform PCA
+    pca = PCA(n_components=n_components)
+    pc_features = pca.fit_transform(features)
+    
+    # Create DataFrame with PCA components
+    pca_df = pd.DataFrame(
+        data=pc_features,
+        columns=[f'PC{i+1}' for i in range(n_components)]
+    )
+    
+    # Split the data
+    X_train, X_test, y_train, y_test = train_test_split(
+        pca_df, labels, test_size=0.3, random_state=42
+    )
+    
+    # Perform K-means clustering
+    kmeans = KMeans(n_clusters=2, random_state=42)
+    kmeans.fit(X_train)
+    
+    # Make predictions
+    y_pred = kmeans.predict(X_test)
+    
+    # Calculate and display confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    print("\nConfusion Matrix:")
+    print(cm)
+    
+    # Print classification report
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
+    
+    # Visualize the clusters
+    # plt.figure(figsize=(10, 6))
+    # scatter = plt.scatter(X_test['PC1'], X_test['PC2'], c=y_pred, cmap='viridis')
+    # plt.xlabel('First Principal Component')
+    # plt.ylabel('Second Principal Component')
+    # plt.title('K-means Clustering Results on PCA Components')
+    # plt.colorbar(scatter)
+    # plt.show()
+    # Calculate and print accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"\nModel Accuracy: {accuracy:.2%}")
+
+# Test the clustering
+perform_kmeans_clustering("data.csv")
