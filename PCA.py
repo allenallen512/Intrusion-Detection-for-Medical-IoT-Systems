@@ -5,16 +5,16 @@ import pandas as pd
 dataPath = "data.csv"
 
 def find_top_n_features(file_path, n):
-    # Reading in the data
     data = pd.read_csv(file_path)
     
-    # Separating features from target if target exists
-    features = data.select_dtypes(include=['float64', 'int64'])
+    # Separating features from target
+    label_column = 'Label'  # specify your label column name
+    features = data.drop(columns=[label_column]).select_dtypes(include=['float64', 'int64'])
     
     # Add this to see excluded columns
     excluded_columns = set(data.columns) - set(features.columns)
-    print("Excluded non-numerical columns:", excluded_columns)
-    
+    print("Excluded columns (including label):", excluded_columns)
+
     # Standardizing the data
     scaler = StandardScaler()
     data_scaled = scaler.fit_transform(features)
@@ -25,7 +25,7 @@ def find_top_n_features(file_path, n):
     
     # Getting the top n features based on explained variance
     components = pca.components_
-    print(components)
+    #doesprint(components)
     explained_variance = pca.explained_variance_ratio_
     
     # Creating a DataFrame of feature importance
@@ -38,6 +38,11 @@ def find_top_n_features(file_path, n):
     # Getting overall importance by summing across components
     feature_importance['Overall_Importance'] = feature_importance.sum(axis=1)
     feature_importance = feature_importance.sort_values('Overall_Importance', ascending=False)
+    
+    # Add this to see the full table
+    print("\nFeature Importance by Principal Component:")
+    pd.set_option('display.float_format', lambda x: '%.3f' % x)  # Format to 3 decimal places
+    print(feature_importance)
     
     # Displaying results
     print(f"Total explained variance ratio: {sum(explained_variance):.2%}")
