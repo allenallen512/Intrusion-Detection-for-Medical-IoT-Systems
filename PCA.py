@@ -7,24 +7,27 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+
+# cleaning the data first ---------------------------------------
 dataPath = "data.csv"
+data = pd.read_csv(dataPath)
 
-def find_top_n_features(file_path, n):
-    data = pd.read_csv(file_path)
-    
-    # Separating features from target
-    label_column = 'Label'  # specify your label column name
-    features = data.drop(columns=[label_column]).select_dtypes(include=['float64', 'int64'])
-    
-    # Add this to see excluded columns
-    excluded_columns = set(data.columns) - set(features.columns)
-    print("Excluded columns (including label):", excluded_columns)
+# seperating features
+label_column = 'Label' 
+features = data.drop(columns=[label_column]).select_dtypes(include=['float64', 'int64'])
 
-    # Standardizing the data
-    scaler = StandardScaler()
-    data_scaled = scaler.fit_transform(features)
+# Add this to see excluded columns
+#excluded_columns = set(data.columns) - set(features.columns)
+#print("Excluded columns (including label):", excluded_columns)
+
+#standardize
+scaler = StandardScaler()
+data_scaled = scaler.fit_transform(features)
+# done cleaning and scaling data ------------------------------------------
+
+def find_top_n_features(data_scaled, features, n):
     
-    # Applying PCA
+    # -----------------applying PCA-----------------------
     pca = PCA(n_components=n)
     pca.fit(data_scaled)
     
@@ -33,7 +36,6 @@ def find_top_n_features(file_path, n):
     #doesprint(components)
     explained_variance = pca.explained_variance_ratio_
     
-    # Creating a DataFrame of feature importance
     feature_importance = pd.DataFrame()
     for i in range(n):
         feature_importance[f'PC{i+1}'] = abs(components[i])
@@ -44,74 +46,70 @@ def find_top_n_features(file_path, n):
     feature_importance['Overall_Importance'] = feature_importance.sum(axis=1)
     feature_importance = feature_importance.sort_values('Overall_Importance', ascending=False)
     
-    # Add this to see the full table
+    # results
     print("\nFeature Importance by Principal Component:")
     pd.set_option('display.float_format', lambda x: '%.3f' % x)  # Format to 3 decimal places
     print(feature_importance)
     
-    # Displaying results
+    
     print(f"Total explained variance ratio: {sum(explained_variance):.2%}")
     print("\nExplained variance ratio by component:")
     for i, var in enumerate(explained_variance):
         print(f"PC{i+1}: {var:.2%}")
     
-    print("\nTop {n} most important features:")
-    print(feature_importance['Overall_Importance'].head(n))
+    print(f"\nTop {n} most important features:")
+    top_10_features = feature_importance['Overall_Importance'].head(10)
+    print(top_10_features)
     
-    # After PCA is applied, add this before the final return:
+    # printing out the combinations
     print("\nPrincipal Component Linear Combinations:")
-    pc_composition = pd.DataFrame(
-        components.T,
-        columns=[f'PC{i+1}' for i in range(n)],
-        index=features.columns
-    )
     
-    for pc in range(n):
+    for pc in range(3): #only want to print the top three
         print(f"\nPC{pc+1} = ", end="")
         # Get the components for this PC
         coefficients = components[pc]
         terms = []
         for feat, coef in zip(features.columns, coefficients):
-            if abs(coef) > 0.1:  # Only show significant contributions (adjust threshold if needed)
+            if abs(coef) > 0.1: #only print if higher than .1
                 terms.append(f"({coef:.3f} × {feat})")
         print(" + ".join(terms))
     
-    return feature_importance
+    return feature_importance, top_10_features
 
 
-find_top_n_features(dataPath, 2)
-
-def perform_kmeans_clustering(dataPath, n_components=2):
+find_top_n_features(data_scaled, features, 10)
+def perform_kmeans_clustering(data_scaled, features, labels, n_components=2):
+    """
+    Perform K-means clustering on PCA components using pre-scaled data
+    
+    Args:
+        data_scaled: scaled numpy array from StandardScaler
+        features: original features DataFrame
+        labels: target labels
+        n_components: number of PCA components to use
+    """
     print("\nPerforming K-means clustering on PCA components...")
     
-    # Read the data
-    data = pd.read_csv(dataPath)
-    features = data.select_dtypes(include=['float64', 'int64']).drop('Label', axis=1)
-    labels = data['Label']
-    
-    # Perform PCA
+    # PCA on scaled data
     pca = PCA(n_components=n_components)
-    pc_features = pca.fit_transform(features)
+    pc_features = pca.fit_transform(data_scaled)
     
-    # Create DataFrame with PCA components
     pca_df = pd.DataFrame(
         data=pc_features,
         columns=[f'PC{i+1}' for i in range(n_components)]
     )
     
-    # Split the data
+    # Split data
     X_train, X_test, y_train, y_test = train_test_split(
         pca_df, labels, test_size=0.1, random_state=42
     )
     
-    # Perform K-means clustering
+    # K-means clustering
     kmeans = KMeans(n_clusters=2, random_state=42)
     kmeans.fit(X_train)
-    
-    # Make predictions
     y_pred = kmeans.predict(X_test)
     
-    # Calculate and display confusion matrix
+    # Evaluation metrics
     cm = confusion_matrix(y_test, y_pred)
     print("\nConfusion Matrix:")
     print(cm)
@@ -126,28 +124,19 @@ def perform_kmeans_clustering(dataPath, n_components=2):
     tp_pct = (tp/total) * 100       
     
     print(f"""
-        True Negatives: {tn} ({tn_pct:.2f}%)
-        False Positives: {fp} ({fp_pct:.2f}%)
-        False Negatives: {fn} ({fn_pct:.2f}%)
-        True Positives: {tp} ({tp_pct:.2f}%)
-        """)
+    True Negatives: {tn} ({tn_pct:.2f}%)
+    False Positives: {fp} ({fp_pct:.2f}%)
+    False Negatives: {fn} ({fn_pct:.2f}%)
+    True Positives: {tp} ({tp_pct:.2f}%)
+    """)
     
-    
-    # Print classification report
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred))
     
-    # # Visualize the clusters
-    # plt.figure(figsize=(10, 6))
-    # scatter = plt.scatter(X_test['PC1'], X_test['PC2'], c=y_pred, cmap='viridis')
-    # plt.xlabel('First Principal Component')
-    # plt.ylabel('Second Principal Component')
-    # plt.title('K-means Clustering Results on PCA Components')
-    # plt.colorbar(scatter)
-    # plt.show()
-    # # Calculate and print accuracy
     accuracy = accuracy_score(y_test, y_pred)
     print(f"\nModel Accuracy: {accuracy:.2%}")
+    
+    return cm, accuracy
 
 # Test the clustering
 # perform_kmeans_clustering("data.csv")

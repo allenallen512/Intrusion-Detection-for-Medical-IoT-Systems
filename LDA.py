@@ -4,7 +4,28 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 
-def perform_lda(dataPath="data.csv"):
+'''
+LDA used for both dimensionality reduction as well as classification
+
+want to try to get top 10 components from PCA then feed those into LDA again to see 
+if the accuracy rises
+'''
+dataPath="data.csv", 
+data = pd.read_csv(dataPath)
+
+# Separating features from target
+label_column = 'Label'
+features = data.drop(columns=[label_column]).select_dtypes(include=['float64', 'int64'])
+labels = data[label_column]
+
+# Show excluded columns
+excluded_columns = set(data.columns) - set(features.columns)
+print("Excluded columns (including label):", excluded_columns)
+
+scaler = StandardScaler()
+features_scaled = scaler.fit_transform(features)
+
+def perform_lda(features_scaled, labels):
     """
     Perform Linear Discriminant Analysis using numeric features.
     
@@ -13,20 +34,7 @@ def perform_lda(dataPath="data.csv"):
     Returns:
         tuple: (accuracy, predictions, actual_values)
     """
-    # Load the dataset
-    data = pd.read_csv(dataPath)
-    
-    # Separating features from target
-    label_column = 'Label'
-    features = data.drop(columns=[label_column]).select_dtypes(include=['float64', 'int64'])
-    labels = data[label_column]
-    
-    # Show excluded columns
-    excluded_columns = set(data.columns) - set(features.columns)
-    print("Excluded columns (including label):", excluded_columns)
-    
-    scaler = StandardScaler()
-    features_scaled = scaler.fit_transform(features)
+    #put in the features scaled and the labels we want to predict
     
     # Split using the features DataFrame
     X_train, X_test, y_train, y_test = train_test_split(
