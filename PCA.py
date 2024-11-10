@@ -79,7 +79,7 @@ def find_top_n_features(file_path, n):
     return feature_importance
 
 
-#find_top_n_features(dataPath, 2)
+find_top_n_features(dataPath, 2)
 
 def perform_kmeans_clustering(dataPath, n_components=2):
     print("\nPerforming K-means clustering on PCA components...")
@@ -101,7 +101,7 @@ def perform_kmeans_clustering(dataPath, n_components=2):
     
     # Split the data
     X_train, X_test, y_train, y_test = train_test_split(
-        pca_df, labels, test_size=0.3, random_state=42
+        pca_df, labels, test_size=0.1, random_state=42
     )
     
     # Perform K-means clustering
@@ -116,11 +116,28 @@ def perform_kmeans_clustering(dataPath, n_components=2):
     print("\nConfusion Matrix:")
     print(cm)
     
+    tn, fp, fn, tp = cm.ravel()
+    total = tn + fp + fn + tp
+    
+    # Calculate percentages
+    tn_pct = (tn/total) * 100
+    fp_pct = (fp/total) * 100
+    fn_pct = (fn/total) * 100
+    tp_pct = (tp/total) * 100       
+    
+    print(f"""
+        True Negatives: {tn} ({tn_pct:.2f}%)
+        False Positives: {fp} ({fp_pct:.2f}%)
+        False Negatives: {fn} ({fn_pct:.2f}%)
+        True Positives: {tp} ({tp_pct:.2f}%)
+        """)
+    
+    
     # Print classification report
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred))
     
-    # Visualize the clusters
+    # # Visualize the clusters
     # plt.figure(figsize=(10, 6))
     # scatter = plt.scatter(X_test['PC1'], X_test['PC2'], c=y_pred, cmap='viridis')
     # plt.xlabel('First Principal Component')
@@ -128,9 +145,9 @@ def perform_kmeans_clustering(dataPath, n_components=2):
     # plt.title('K-means Clustering Results on PCA Components')
     # plt.colorbar(scatter)
     # plt.show()
-    # Calculate and print accuracy
+    # # Calculate and print accuracy
     accuracy = accuracy_score(y_test, y_pred)
     print(f"\nModel Accuracy: {accuracy:.2%}")
 
 # Test the clustering
-perform_kmeans_clustering("data.csv")
+# perform_kmeans_clustering("data.csv")

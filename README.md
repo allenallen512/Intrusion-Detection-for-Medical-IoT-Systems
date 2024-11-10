@@ -52,8 +52,7 @@ SrcMac: MAC address of the source device.
 DstMac: MAC address of the destination device.
 Packet_num: Number assigned to each packet, helping in identifying sequence.
 
-**Biometric Data:
-**
+**Biometric Data:**
 Temp: Body temperature of the patient.
 SpO2: Oxygen saturation level in the patient’s blood.
 Pulse_Rate: Patient’s pulse rate.
