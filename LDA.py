@@ -3,6 +3,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, classification_report
 
 '''
 LDA used for both dimensionality reduction as well as classification
@@ -60,16 +61,18 @@ def perform_lda(features_scaled, labels):
 
     # Make predictions
     y_pred = lda.predict(X_test)
+    # Calculate confusion matrix
+    conf_matrix = confusion_matrix(y_test, y_pred)
+    print("\nConfusion Matrix:")
+    print(conf_matrix)
+
+    # Generate classification report
+    class_report = classification_report(y_test, y_pred)
+    print("\nClassification Report:")
+    print(class_report)
+    accuracy = accuracy_score(y_test, y_pred)   
+    return conf_matrix, class_report, accuracy
     
-    # Calculate accuracy
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f"\nModel Accuracy: {accuracy:.2f}")
-    
-    print(f"Number of features: {len(features.columns)}")
-    print(f"Number of unique classes: {len(labels.unique())}")
-    print(f"Number of LDA components: {lda.n_components}")
-        
-    return accuracy, y_pred, y_test, lda
 
 if __name__ == "__main__":
     perform_lda()
