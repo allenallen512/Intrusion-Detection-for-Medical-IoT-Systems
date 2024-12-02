@@ -1,12 +1,14 @@
 Finding the best intrusion detection system on WUSTL EHMS 2020 Dataset for Internet of Medical Things (IoMT) Cybersecurity Research Data Set.
 
+"Main.ipynb" contains all data processing, helper functions, models, and final run-through functions. Data is in file "data.csv". All other files are draft files where we experimented with creating our models.
+
+
 Link: https://www.cse.wustl.edu/~jain/ehms/index.html
 
 Useful Links:
 https://medium.com/swlh/k-means-clustering-on-high-dimensional-data-d2151e1a4240
 https://www.tensorflow.org/tutorials/images/cnn
 
-Data is in file "data.csv" 
 
 **Network Flow Headers:**
 
