@@ -79,15 +79,7 @@ def find_top_n_features(data_scaled, features, n):
 
 find_top_n_features(data_scaled, features, 10)
 def perform_kmeans_clustering(data_scaled, features, labels, n_components=2):
-    """
-    Perform K-means clustering on PCA components using pre-scaled data
-    
-    Args:
-        data_scaled: scaled numpy array from StandardScaler
-        features: original features DataFrame
-        labels: target labels
-        n_components: number of PCA components to use
-    """
+   
     print("\nPerforming K-means clustering on PCA components...")
     
     # PCA on scaled data

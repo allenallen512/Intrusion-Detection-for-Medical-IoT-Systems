@@ -5,12 +5,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, classification_report
 
-'''
-LDA used for both dimensionality reduction as well as classification
-
-want to try to get top 10 components from PCA then feed those into LDA again to see 
-if the accuracy rises
-'''
 dataPath="data.csv", 
 data = pd.read_csv(dataPath)
 
@@ -27,14 +21,7 @@ scaler = StandardScaler()
 features_scaled = scaler.fit_transform(features)
 
 def perform_lda(features_scaled, labels):
-    """
-    Perform Linear Discriminant Analysis using numeric features.
-    
-    Args:
-        dataPath (str): Path to the CSV data file
-    Returns:
-        tuple: (accuracy, predictions, actual_values)
-    """
+  
     #put in the features scaled and the labels we want to predict
     
     # Split using the features DataFrame
